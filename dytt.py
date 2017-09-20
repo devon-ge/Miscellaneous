@@ -15,8 +15,7 @@ def getHTMLText(url, code='utf-8'):
         return ''
 
 def getMoiveInfoUrl(movie_queue, Url):
-    '''返回值是一个链接，对应电影的介绍页面
-    '''
+    '''返回值是一个链接，对应电影的介绍页面'''
     html = getHTMLText(Url)
     soup = BeautifulSoup(html, 'html.parser')
     a = soup.find_all('a')
@@ -28,9 +27,7 @@ def getMoiveInfoUrl(movie_queue, Url):
             continue
 
 def getDownloadUrl(MoviePage):
-    '''
-    MoviePage 是电影介绍的网页地址，返回值是ftp下载链接, 如无匹配链接，返回空字符
-    '''
+    '''MoviePage 是电影介绍的网页地址，返回值是ftp下载链接, 如无匹配链接，返回空字符'''
     pattern = re.compile(r'ftp://.+?\.rmvb|ftp://.+?\.mkv')
     html = getHTMLText(MoviePage, 'gb2312')
     match = re.findall(pattern, html)
@@ -40,9 +37,7 @@ def getDownloadUrl(MoviePage):
         return 'Error' 
 
 def getMovieName(downloadLink):
-    '''
-    输入ftp链接，使用正则表达式分析文本，返回电影名字
-    '''
+    '''输入ftp链接，使用正则表达式分析文本，返回电影名字'''
     name_patten = re.compile(r'\](?!/)\.?(.+?)\.[a-z]{3,4}$')   #结果是xxx.rmvb 或xxx.mkv
     name_match = re.findall(name_patten, downloadLink)
     if bool(name_match):
@@ -59,7 +54,7 @@ def main():
     for page in range(2, 5):
         getMoiveInfoUrl(Movie_queue, movie_start_url + '_' + str(page) + '.html')
     j = 1
-    #=========================能否使用多线程方式处理下载队列=========================
+    #=========================暂时的处理方式=========================
     while Movie_queue:
         downloadLink = getDownloadUrl(Movie_queue.popleft())
         name = getMovieName(downloadLink)
