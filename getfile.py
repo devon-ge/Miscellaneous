@@ -1,4 +1,4 @@
-"""This module is used to get all the articles' information published in Journal of Finance"""
+"""This module is used to get all the articles' in some websites"""
 
 import os
 import sys
