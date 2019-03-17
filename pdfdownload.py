@@ -33,6 +33,6 @@ class Sec(scrapy.Spider):
         filename = response.url.split(
             '/')[6] + '_' + response.css('div.info::text').extract_first()
         url = response.css('a::attr(href)').re(r'/Ar.*[(html?)|(txt)]')[0]
-        pdfkit.from_url('http://www.sec.gov'+url, '%s.pdf' %
+        yield pdfkit.from_url('http://www.sec.gov'+url, '%s.pdf' %
                         filename, configuration=config, options=options)
         self.log('Saved file %s' % filename)

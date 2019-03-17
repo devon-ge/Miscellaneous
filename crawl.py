@@ -26,7 +26,7 @@ def camera(url=None):
     titles = cameras.find_all('li')
     # issue ------------------------------------
     for title in titles:
-        result.append(HOME + title.find('a').[href])
+        result.append(HOME + title.find('a')['href'])
     return result
     # -----------------------------------------------
     # find **sources**
@@ -46,7 +46,7 @@ def write_results(source):
     with open('results.txt', 'w') as f:
         for url in urls:
             # find products mix
-            soup2 = get_html_text(url)
+            soup2 = html_text(url)
             product = soup2.find('div', class_='pagelist5 clearfix')
             # # single product
             results = product.find_all('div', class_='jjfajsh1')
