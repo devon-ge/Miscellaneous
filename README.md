@@ -1,8 +1,8 @@
 # Crawl
-Python Crawls marerials consisting of source codes and results. I will update this project regularly.
+Python learning marerials consisting of source codes and results. I will update this project regularly.
 
-__author__: Devon （葛德生）
+__author__: Devon Ge
 
-__version__: 2.0
+__version__: 3.0
 
-Email: gdsuibe@gmail.com
+Email: dsge@pku.edu.cn
