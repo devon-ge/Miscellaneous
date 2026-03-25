@@ -1,0 +1,41 @@
+name: Update sing-box Rules
+
+on:
+  schedule:
+    - cron: '0 21 * * *' # 每天北京时间上午 8 点运行
+  workflow_dispatch:      # 允许手动触发运行
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Code
+        uses: actions/checkout@v4
+
+      - name: Install sing-box & jq
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y jq
+          # 下载最新的 sing-box 运行文件
+          curl -Lo sing-box.tar.gz https://github.com/SagerNet/sing-box/releases/download/v1.13.3/sing-box-1.13.3-linux-amd64.tar.gz
+          tar -xzf sing-box.tar.gz
+          sudo mv sing-box-*/sing-box /usr/local/bin/
+
+      - name: Fetch and Convert
+        run: |
+          # 1. 下载并合并 IPv4 & IPv6 (使用 jq 处理 JSON)
+          curl -s https://raw.githubusercontent.com/tmplink/IPDB/main/ipv4/cidr/CN.txt > ipv4.txt
+          curl -s https://raw.githubusercontent.com/tmplink/IPDB/main/ipv6/cidr/CN.txt > ipv6.txt
+          
+          cat ipv4.txt ipv6.txt | grep . | jq -R . | jq -s '{version: 1, rules: [{ip_cidr: .}]}' > cn.json
+          
+          # 2. 编译为 srs
+          sing-box rule-set compile cn.json -o cn.srs
+
+      - name: Push to Repo
+        run: |
+          git config --local user.email "action@github.com"
+          git config --local user.name "GitHub Action"
+          git add cn.srs
+          git commit -m "Update CN IP rules ($(date +'%Y-%m-%d'))" || exit 0
+          git push
