@@ -10,7 +10,7 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - name: Checkout Code
-        uses: actions/checkout@v4
+        uses: actions/checkout@v6
 
       - name: Install sing-box & jq
         run: |
@@ -30,12 +30,12 @@ jobs:
           cat ipv4.txt ipv6.txt | grep . | jq -R . | jq -s '{version: 1, rules: [{ip_cidr: .}]}' > cn.json
           
           # 2. 编译为 srs
-          sing-box rule-set compile cn.json -o cn.srs
+          sing-box rule-set compile cn.json -o geoip-cn.srs
 
       - name: Push to Repo
         run: |
           git config --local user.email "action@github.com"
           git config --local user.name "GitHub Action"
-          git add cn.srs
+          git add geoip-cn.srs
           git commit -m "Update CN IP rules ($(date +'%Y-%m-%d'))" || exit 0
           git push
