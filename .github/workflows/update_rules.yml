@@ -34,8 +34,18 @@ jobs:
 
       - name: Push to Repo
         run: |
-          git config --local user.email "action@github.com"
-          git config --local user.name "GitHub Action"
+          git config --local user.email "github-actions[bot]@users.noreply.github.com"
+          git config --local user.name "github-actions[bot]"
+          
+          # 检查文件是否存在
+          ls -lh geoip-cn.srs || echo "File not found!"
+          
           git add geoip-cn.srs
-          git commit -m "Update CN IP rules ($(date +'%Y-%m-%d'))" || exit 0
-          git push
+          
+          # 仅在有变动时提交，并打印状态
+          if git diff --staged --quiet; then
+            echo "No changes detected in geoip-cn.srs"
+          else
+            git commit -m "Update CN IP rules ($(date +'%Y-%m-%d'))"
+            git push origin master
+          fi
