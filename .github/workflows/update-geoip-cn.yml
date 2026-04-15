@@ -2,7 +2,6 @@ name: Update GeoIP-CN
 
 on:
   schedule:
-    # 每天 UTC 21:00 (北京时间 5:00) 运行
     - cron: '0 21 * * *'
   workflow_dispatch:
 
@@ -15,6 +14,9 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+        with:
+          # 必须拉取最新内容以确保 push 成功
+          fetch-depth: 0
 
       - name: Set up Python
         uses: actions/setup-python@v6
@@ -33,44 +35,16 @@ jobs:
         run: |
           sing-box rule-set compile output/geoip-cn.json -o output/geoip-cn.srs
           echo "Compiled geoip-cn.srs successfully"
-          ls -lh output/
 
-      - name: Generate release tag
-        id: tag
-        run: echo "tag=$(date +'%Y%m%d')" >> $GITHUB_OUTPUT
-
-      - name: Upload to Release
-        uses: softprops/action-gh-release@v2
-        with:
-          tag_name: ${{ steps.tag.outputs.tag }}
-          name: "GeoIP-CN ${{ steps.tag.outputs.tag }}"
-          body: |
-            Auto-generated GeoIP-CN rule sets.
-            Updated: ${{ steps.tag.outputs.tag }}
-
-            ## Files
-            - `geoip-cn.srs` - sing-box binary rule-set
-            - `geoip-cn.json` - sing-box JSON rule-set source
-            - `cn_ipv4.txt` - Aggregated IPv4 CIDR list
-            - `cn_ipv6.txt` - Aggregated IPv6 CIDR list
-
-            ## Sources
-            - APNIC delegated
-            - 17mon/china_ip_list (IPIP)
-            - gaoyifan/china-operator-ip
-            - missuo/ASN-China
-          files: |
-            output/geoip-cn.srs
-            output/geoip-cn.json
-            output/cn_ipv4.txt
-            output/cn_ipv6.txt
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-
-      - name: Commit output to repo
+      - name: Commit and Push
         run: |
           git config --local user.email "github-actions[bot]@users.noreply.github.com"
           git config --local user.name "github-actions[bot]"
           git add output/
-          git commit -m "chore: update geoip-cn $(date +'%Y-%m-%d')" || echo "No changes"
-          git push
+          # 检查是否有文件更改，避免没有更新时报错
+          if git diff --staged --quiet; then
+            echo "No changes to commit"
+          else
+            git commit -m "chore: auto-update assets $(date +'%Y-%m-%d')"
+            git push
+          fi
