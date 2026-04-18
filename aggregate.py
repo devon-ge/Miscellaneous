@@ -16,24 +16,12 @@ SOURCES = {
         "url": "https://ftp.apnic.net/apnic/stats/apnic/delegated-apnic-latest",
         "type": "apnic",
     },
-    "17mon": {
-        "url": "https://raw.githubusercontent.com/17mon/china_ip_list/master/china_ip_list.txt",
+    "china-operator-ip": {
+        "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china46.txt",
         "type": "cidr",
     },
-    "china-operator-ipv4": {
-        "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china.txt",
-        "type": "cidr",
-    },
-    "china-operator-ipv6": {
-        "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china6.txt",
-        "type": "cidr",
-    },
-    "asn-china-ipv4": {
-        "url": "https://raw.githubusercontent.com/missuo/ASN-China/main/IP.China.ipv4",
-        "type": "cidr",
-    },
-    "asn-china-ipv6": {
-        "url": "https://raw.githubusercontent.com/missuo/ASN-China/main/IP.China.ipv6",
+    "asn-china: {
+        "url": "https://raw.githubusercontent.com/cbuijs/ipasn/master/country-asia-china.list",
         "type": "cidr",
     },
 }
