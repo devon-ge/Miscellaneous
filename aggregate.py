@@ -20,7 +20,7 @@ SOURCES = {
         "url": "https://raw.githubusercontent.com/gaoyifan/china-operator-ip/ip-lists/china46.txt",
         "type": "cidr",
     },
-    "asn-china: {
+    "asn-china": {
         "url": "https://raw.githubusercontent.com/cbuijs/ipasn/master/country-asia-china.list",
         "type": "cidr",
     },
