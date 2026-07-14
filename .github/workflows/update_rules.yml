@@ -1,8 +1,8 @@
 name: Update sing-box Rules
 
 on:
-  schedule:
-    - cron: '0 21 * * *' # 每天北京时间上午 8 点运行
+  # schedule:
+  #   - cron: '0 21 * * *' # 每天北京时间上午 8 点运行
   workflow_dispatch:      # 允许手动触发运行
 
 jobs:
