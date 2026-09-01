@@ -1,0 +1,46 @@
+name: Build APNIC Sing-Box SRS Rule-Set
+
+on:
+  schedule:
+    - cron: '0 0 * * 0' # 每周日 0:00 自动触发
+  workflow_dispatch: # 支持手动点击触发
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.x'
+
+      - name: Download & Install Sing-Box CLI
+        run: |
+          SINGBOX_VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | jq -r .tag_name | sed 's/v//')
+          curl -LO "https://github.com/SagerNet/sing-box/releases/download/v${SINGBOX_VERSION}/sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz"
+          tar -xzf "sing-box-${SINGBOX_VERSION}-linux-amd64.tar.gz"
+          sudo mv "sing-box-${SINGBOX_VERSION}-linux-amd64/sing-box" /usr/local/bin/
+          sing-box version
+
+      - name: Generate JSON Source
+        run: |
+          python3 generate_json.py
+
+      - name: Compile SRS Rule-Set
+        run: |
+          sing-box rule-set compile apnic_cn.json -o geoip-cn-apnic.srs
+
+      - name: Deploy to Release
+        uses: softprops/action-gh-release@v2
+        if: success()
+        with:
+          tag_name: latest
+          name: APNIC CN SRS Rule-Set
+          files: |
+            geoip-cn-apnic.srs
+            apnic_cn.json
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
