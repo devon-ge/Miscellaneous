@@ -1,0 +1,70 @@
+name: Update IP Rule-Set and Release
+
+on:
+  schedule:
+    # 设定定时任务，例如：每天 UTC 时间 0:00 (北京时间早 8:00) 运行一次
+    - cron: '0 0 * * *'
+  workflow_dispatch: # 支持在 GitHub 页面手动点击运行
+
+jobs:
+  update-and-release:
+    runs-on: ubuntu-latest
+    
+    # 给 Job 授予 GitHub Release 的写权限
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout Repository
+        uses: actions/checkout@v7
+
+      - name: Set up Python
+        uses: actions/setup-python@v7
+        with:
+          python-version: '3.x'
+
+      - name: Run IP Aggregator Script
+        run: |
+          python aggregate.py
+
+      - name: Install sing-box
+        run: |
+          # 自动获取并安装最新版 sing-box 工具
+          SING_BOX_VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep -oP '"tag_name": "\K[^"]+')
+          VERSION_NUM=${SING_BOX_VERSION#v}
+          echo "Installing sing-box ${SING_BOX_VERSION}..."
+          
+          curl -LO "https://github.com/SagerNet/sing-box/releases/download/${SING_BOX_VERSION}/sing-box-${VERSION_NUM}-linux-amd64.tar.gz"
+          tar -xzf "sing-box-${VERSION_NUM}-linux-amd64.tar.gz"
+          sudo mv "sing-box-${VERSION_NUM}-linux-amd64/sing-box" /usr/local/bin/
+          sing-box version
+
+      - name: Compile sing-box Rule-set (.srs)
+        run: |
+          # 将脚本生成的 JSON 编译成二进制 .srs 文件
+          sing-box rule-set compile output/geoip-cn.json -o output/geoip-cn.srs
+
+      - name: Generate Release Tag
+        id: tag
+        run: |
+          # 生成以当前日期为标识的 Tag 名，如 2026.09.03
+          TAG_NAME=$(date -u +'%Y.%m.%d')
+          echo "tag_name=${TAG_NAME}" >> $GITHUB_OUTPUT
+
+      - name: Create or Update GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.tag.outputs.tag_name }}
+          name: "China IP Rule Set - ${{ steps.tag.outputs.tag_name }}"
+          body: |
+            Automatic update of China Mainland IP rules.
+            Updated on: ${{ steps.tag.outputs.tag_name }}
+          draft: false
+          prerelease: false
+          files: |
+            output/cn_ipv4.txt
+            output/cn_ipv6.txt
+            output/geoip-cn.json
+            output/geoip-cn.srs
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
