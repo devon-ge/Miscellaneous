@@ -35,7 +35,7 @@ jobs:
 
       - name: Compile sing-box Rule-set (.srs)
         run: |
-          sing-box rule-set compile geoip-cn.json -o geoip-cn.srs
+          sing-box rule-set compile ./output/geoip-cn.json -o geoip-cn.srs
 
       - name: Delete Old Release and Tag
         run: |
