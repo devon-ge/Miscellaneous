@@ -23,7 +23,7 @@ jobs:
 
       - name: Run IP Aggregator Script
         run: |
-          python update.py
+          python aggregate.py
 
       - name: Install sing-box
         run: |
