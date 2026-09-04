@@ -1,8 +1,8 @@
 name: Build APNIC Sing-Box SRS Rule-Set
 
 on:
-  schedule:
-    - cron: '0 21 * * *'
+  # schedule:
+  #   - cron: '0 21 * * *'
   workflow_dispatch: # 支持手动点击触发
 
 jobs:
