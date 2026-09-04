@@ -27,15 +27,13 @@ jobs:
 
       - name: Install sing-box
         run: |
-          SING_BOX_VERSION=$(curl -s https://api.github.com/repos/SagerNet/sing-box/releases/latest | grep -oP '"tag_name": "\K[^"]+')
-          VERSION_NUM=${SING_BOX_VERSION#v}
-          curl -LO "https://github.com/SagerNet/sing-box/releases/download/${SING_BOX_VERSION}/sing-box-${VERSION_NUM}-linux-amd64.tar.gz"
-          tar -xzf "sing-box-${VERSION_NUM}-linux-amd64.tar.gz"
-          sudo mv "sing-box-${VERSION_NUM}-linux-amd64/sing-box" /usr/local/bin/
+          bash <(curl -fsSL https://sing-box.app/deb-install.sh)
+          sing-box version
 
-      - name: Compile sing-box Rule-set (.srs)
+      - name: Compile JSON to SRS
         run: |
-          sing-box rule-set compile ./output/geoip-cn.json -o geoip-cn.srs
+          sing-box rule-set compile output/geoip-cn.json -o output/geoip-cn.srs
+          echo "Compiled geoip-cn.srs successfully"
 
       - name: Delete Old Release and Tag
         run: |
