@@ -1,8 +1,8 @@
 name: Update GeoIP-CN
 
 on:
-  schedule:
-    - cron: '0 21 * * *'
+  # schedule:
+    # - cron: '0 21 * * *'
   workflow_dispatch:
 
 permissions:
